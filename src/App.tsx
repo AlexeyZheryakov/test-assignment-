@@ -1,24 +1,28 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import './App.scss';
+import { Button, Form } from 'react-bootstrap';
 
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <div className="title">
+        <div className="conteiner">
+          <div className="title__row">
+            <div className="title__item input">
+              <Form.Control type="text" placeholder="Normal text" />
+            </div>
+            <div className="title__item">
+              <Button variant="success">Загрузить</Button>
+            </div>
+            <div className="title__item">
+              <Button variant="danger">Очистить</Button>
+            </div>
+            <div className="title__item">
+              <Button variant="primary">Группировать</Button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
