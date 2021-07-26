@@ -1,40 +1,93 @@
-import React from 'react';
+import React, { useReducer } from 'react';
 import './App.scss';
 import { Button, Form } from 'react-bootstrap';
 import Api from './Api';
+import reduser from './store';
+import { IDataListItem } from './types';
 
-interface IItem {
-  tag: string;
-  url: string;
-}
+
 
 function App() {
-  const [dataList, setDataList] = React.useState<Array<IItem>>([]);
-  const [search, setSearch] = React.useState<string>('');
-  const [group, setGroup] = React.useState<boolean>(false);
-  const [tagsForGroup, setTagsForGroup] = React.useState<Array<string>>([]) 
+  const [state, dispatch] = useReducer(reduser, { dataList: [], search: '', group: false, tagsForGroup: [], loading: false });
   const handleClear = () => {
-    setDataList([]);
-    setSearch('');
+    dispatch({
+      type: 'clear',
+      payload: {
+        dataList: [],
+        search: '',
+      }
+    })
   };
 
-  const handlGroup = () => {
-    setGroup(!group);
+  const tagHandler = (value:string) => {
+    dispatch({
+      type: 'search',
+      payload: {
+        search: value,
+      }
+    })
+  }
+
+  const handleGroup = () => {
+    dispatch({
+      type: 'group',
+      payload: {
+        group: !state.group,
+      }
+    })
   };
+
+  const handleLoading = () => {
+    if(state.search === '') {
+      alert('Заполните поле "тег"')
+    } else if (/^[A-Za-z,]+$/.test(state.search)) {
+      getData()
+    } else {
+      alert('Не допустимое значение поля "тег"')
+    }
+  }
 
   const getData = async () => {
     try {
-      const { data } = await Api.getData(search);
+      dispatch({
+        type: 'loading false',
+        payload: {
+          loading: true,
+        }
+      })
+      const { data } = await Api.getData(state.search);
       setTimeout(() => {
-        setDataList([...dataList, {tag: search, url: data.data.image_url}]);
+        if(data.data.image_url !== undefined) {
+          dispatch({
+            type: 'add dataList',
+            payload: {
+              dataList: {tag: state.search, url: data.data.image_url},
+              loading: false,
+            }
+          })
+        } else {
+          alert('По тегу ничего не найдено');
+          dispatch({
+            type: 'loading false',
+            payload: {
+              loading: true,
+            }
+          })
+        }
       }, 1000);
     } catch (error) {
-      console.log(error);
+      alert('Произошла http ошибка');
+      dispatch({
+        type: 'loading false',
+        payload: {
+          loading: true,
+        }
+      })
     }
   };
 
   React.useEffect(() => {
-    const arr = dataList.map((item:IItem) => item.tag);
+    const arr = state.dataList.map((item:IDataListItem) => item.tag);
     function unique(arr:Array<string>) {
     let result:Array<string> = [];
   
@@ -44,27 +97,35 @@ function App() {
       }
     }
   
-    return setTagsForGroup(result);
+    return dispatch({
+      type: 'add tags for group',
+      payload: {
+        tagsForGroup: result,
+      }
+    })
   };
     unique(arr);
-  }, [dataList])
+    console.log(state.dataList);
+    
+  }, [state.dataList])
   return (
     <div className="App">
       <div className="title">
         <div className="conteiner">
           <div className="title__row">
             <div className="title__item input">
-              <Form.Control value={search} onChange={(e) => setSearch(e.target.value)} type="text" placeholder="Normal text" />
+              <Form.Control value={state.search} onChange={(e) => tagHandler(e.target.value)} type="text" placeholder="Normal text" />
             </div>
             <div className="title__item">
-              <Button onClick={getData} variant="success">Загрузить</Button>
+              {!state.loading &&<Button onClick={handleLoading} variant="success">Загрузить</Button>}
+              {state.loading && <Button disabled variant="success">Загрузка...</Button>}
             </div>
             <div className="title__item">
               <Button onClick={handleClear} variant="danger">Очистить</Button>
             </div>
             <div className="title__item">
-              {!group && <Button onClick={handlGroup} variant="primary">Группировать</Button>}
-              {group && <Button onClick={handlGroup} variant="primary">Разгруппировать</Button>}
+              {!state.group && <Button onClick={handleGroup} variant="primary">Группировать</Button>}
+              {state.group && <Button onClick={handleGroup} variant="primary">Разгруппировать</Button>}
             </div>
           </div>
         </div>
@@ -72,24 +133,24 @@ function App() {
       <div className="body">
         <div className="conteiner">
           <div className="body__row">
-            {!group && dataList.map((item:IItem, index) => (
+            {!state.group && state.dataList.map((item:IDataListItem, index:number) => (
               <div key={index} className="body__item">
                 <img src={item.url} alt="" />
               </div>
             ))}
           </div>
           <div className="body_column">
-            {group && tagsForGroup.map((itemGroup:string, index) => (
-              <>
+            {state.group && state.tagsForGroup.map((itemGroup:string, index:number) => (
+              <div key={index}>
                 <div>{itemGroup}</div>
-                <div key={index} className="body__group">
-                  {dataList.map((item:IItem, index) => itemGroup === item.tag && (
+                <div  className="body__group">
+                  {state.dataList.map((item:IDataListItem, index:number) => itemGroup === item.tag && (
                     <div key={index} className="body__item">
                       <img src={item.url} alt="" />
                     </div>
                   ))}
                 </div>
-              </>
+              </div>
             ))}
           </div>
         </div>
