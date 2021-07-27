@@ -8,7 +8,7 @@ export const initialState = {
   loading: false,
 };
 
-const reduser = (state: IState, action: IAction) => {
+const reducer = (state: IState, action: IAction) => {
   switch (action.type) {
     case "CLEAR":
       return {
@@ -50,4 +50,4 @@ const reduser = (state: IState, action: IAction) => {
   }
 };
 
-export default reduser;
+export default reducer;

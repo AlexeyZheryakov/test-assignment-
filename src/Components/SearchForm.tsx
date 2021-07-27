@@ -1,8 +1,17 @@
 import "../App.scss";
 import { Button, Form } from "react-bootstrap";
 import { IState } from "../types";
+import React from "react";
 
-function SearchForm(state:IState, tagHandler:Function, handleLoading:Function, handleClear:Function, handleGroup:Function) {
+interface ISearchForm {
+    state: IState,
+    tagHandler: (value:string )=> void,
+    handleLoading: () => void,
+    handleClear: () => void,
+    handleGroup: () => void,
+}
+
+const SearchForm: React.FC<ISearchForm> = ({state, tagHandler, handleLoading, handleClear, handleGroup}) => {
   const loading = () => handleLoading();
   const clear = () => handleClear();
   const group = () => handleGroup();

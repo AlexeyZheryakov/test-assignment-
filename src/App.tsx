@@ -1,7 +1,7 @@
 import React, { useReducer } from "react";
 import "./App.scss";
 import Api from "./Api";
-import reduser, { initialState } from "./store";
+import reducer, { initialState } from "./store";
 import { IDataListItem, IState, IAction } from "./types";
 import List from './Components/List';
 import GroupList from './Components/GroupList';
@@ -9,7 +9,7 @@ import SearchForm from './Components/SearchForm';
 
 function App() {
   const [state, dispatch] = useReducer<React.Reducer<IState, IAction>>(
-    reduser,
+    reducer,
     initialState
   );
 
@@ -51,7 +51,7 @@ function App() {
     }
   };
 
-  const allQuery = () => Promise.all(state.search.split(',').map((tag) => getData(tag)));
+  const allQuery = () => Promise.all(state.search.split(',').map((tag) => getData(tag))).then(e => console.log(e));
 
   const getData = async (tag:string) => {
     try {
@@ -117,15 +117,21 @@ function App() {
   return (
     <div className="App">
       <div className="SearchForm">
-        {SearchForm(state, tagHandler, handleLoading, handleClear, handleGroup)}
+        <SearchForm 
+          state={state}
+          tagHandler={tagHandler}
+          handleLoading={handleLoading}
+          handleClear={handleClear}
+          handleGroup={handleGroup} 
+        />
       </div>
       <div className="body">
         <div className="conteiner">
           <div className="body__list">
-            {!state.group && List(state.dataList, tagHandler)}
+            {!state.group && <List dataList={state.dataList} tagHandler={tagHandler}/> }
           </div>
           <div className="body_groupList">
-            {state.group && GroupList(state.tagsForGroupWithData, tagHandler)}
+            {state.group && <GroupList tagsForGroupWithData={state.tagsForGroupWithData} tagHandler={tagHandler}/>}
           </div>
         </div>
       </div>
