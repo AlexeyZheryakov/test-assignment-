@@ -1,5 +1,5 @@
 import "../App.scss";
-import { IDataListItem, IState, IAction } from "../types";
+import { IDataListItem } from "../types";
 import { ITagsForGroupWithData } from '../types';
 
 function GroupList(props:ITagsForGroupWithData) {

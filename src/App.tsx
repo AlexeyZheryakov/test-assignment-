@@ -1,17 +1,18 @@
 import React, { useReducer } from "react";
 import "./App.scss";
-import { Button, Form } from "react-bootstrap";
 import Api from "./Api";
 import reduser, { initialState } from "./store";
 import { IDataListItem, IState, IAction } from "./types";
 import List from './Components/List';
 import GroupList from './Components/GroupList';
+import SearchForm from './Components/SearchForm';
 
 function App() {
   const [state, dispatch] = useReducer<React.Reducer<IState, IAction>>(
     reduser,
     initialState
   );
+
   const handleClear = () => {
     dispatch({
       type: "CLEAR",
@@ -46,7 +47,7 @@ function App() {
     } else if (/^[A-Za-z,]+$/.test(state.search)) {
       getData();
     } else {
-      alert('Не допустимое значение поля "тег"');
+      alert('Не допустимое значение поля "тег", только латинские буквы');
     }
   };
 
@@ -108,72 +109,12 @@ function App() {
 
   React.useEffect(() => {
    groupByTag(state.dataList);
-   console.log(state.tagsForGroupWithData);
-   
-    
-    // const arr = state.dataList.map((item: IDataListItem) => item.tag);
-    // function unique(arr: Array<string>) {
-    //   let result: Array<string> = [];
-
-    //   for (let str of arr) {
-    //     if (!result.includes(str)) {
-    //       result.push(str);
-    //     }
-    //   }
-
-    //   return dispatch({
-    //     type: "ADD_TAG_BY_GROUP",
-    //     payload: {
-    //       tagsForGroup: result,
-    //     },
-    //   });
-    // }
-    // unique(arr);
   }, [state.dataList]);
+
   return (
     <div className="App">
-      <div className="title">
-        <div className="conteiner">
-          <div className="title__row">
-            <div className="title__item input">
-              <Form.Control
-                value={state.search}
-                onChange={(e) => tagHandler(e.target.value)}
-                type="text"
-                placeholder="Normal text"
-              />
-            </div>
-            <div className="title__item">
-              {!state.loading && (
-                <Button onClick={handleLoading} variant="success">
-                  Загрузить
-                </Button>
-              )}
-              {state.loading && (
-                <Button disabled variant="success">
-                  Загрузка...
-                </Button>
-              )}
-            </div>
-            <div className="title__item">
-              <Button onClick={handleClear} variant="danger">
-                Очистить
-              </Button>
-            </div>
-            <div className="title__item">
-              {!state.group && (
-                <Button onClick={handleGroup} variant="primary">
-                  Группировать
-                </Button>
-              )}
-              {state.group && (
-                <Button onClick={handleGroup} variant="primary">
-                  Разгруппировать
-                </Button>
-              )}
-            </div>
-          </div>
-        </div>
+      <div className="SearchForm">
+        {SearchForm(state, tagHandler, handleLoading, handleClear, handleGroup)}
       </div>
       <div className="body">
         <div className="conteiner">
