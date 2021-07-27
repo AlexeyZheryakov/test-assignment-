@@ -45,13 +45,15 @@ function App() {
     if (state.search === "") {
       alert('Заполните поле "тег"');
     } else if (/^[A-Za-z,]+$/.test(state.search)) {
-      getData();
+      allQuery();
     } else {
       alert('Не допустимое значение поля "тег", только латинские буквы');
     }
   };
 
-  const getData = async () => {
+  const allQuery = () => Promise.all(state.search.split(',').map((tag) => getData(tag)));
+
+  const getData = async (tag:string) => {
     try {
       dispatch({
         type: "LOADING",
@@ -59,7 +61,7 @@ function App() {
           loading: true,
         },
       });
-      const { data } = await Api.getData(state.search);
+      const { data } = await Api.getData(tag);
       setTimeout(() => {
         if (data.data.image_url !== undefined) {
           dispatch({
@@ -69,6 +71,7 @@ function App() {
               loading: false,
             },
           });
+          console.log(state.dataList);
         } else {
           alert("По тегу ничего не найдено");
           dispatch({
