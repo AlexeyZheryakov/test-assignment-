@@ -5,6 +5,7 @@ import Api from "./Api";
 import reduser, { initialState } from "./store";
 import { IDataListItem, IState, IAction } from "./types";
 import List from './Components/List';
+import GroupList from './Components/GroupList';
 
 function App() {
   const [state, dispatch] = useReducer<React.Reducer<IState, IAction>>(
@@ -88,26 +89,46 @@ function App() {
     }
   };
 
-  React.useEffect(() => {
-    const arr = state.dataList.map((item: IDataListItem) => item.tag);
-    function unique(arr: Array<string>) {
-      let result: Array<string> = [];
-
-      for (let str of arr) {
-        if (!result.includes(str)) {
-          result.push(str);
-        }
+  const groupByTag = (array:Array<IDataListItem>) => {
+    const groupByTagObject =  array.reduce((acc:any, item) => {
+      if (acc[item.tag]) {
+        acc[item.tag] = [...acc[item.tag], item];
+      } else {
+        acc[item.tag] = [item];
       }
+      return acc;
+  }, {});
+  return dispatch({
+    type: "ADD_TAG_BY_GROUP",
+    payload: {
+      tagsForGroupWithData: groupByTagObject,
+    },
+  });
+  }
 
-      return dispatch({
-        type: "ADD_TAG_BY_GROUP",
-        payload: {
-          tagsForGroup: result,
-        },
-      });
-    }
-    unique(arr);
-    console.log(state.dataList);
+  React.useEffect(() => {
+   groupByTag(state.dataList);
+   console.log(state.tagsForGroupWithData);
+   
+    
+    // const arr = state.dataList.map((item: IDataListItem) => item.tag);
+    // function unique(arr: Array<string>) {
+    //   let result: Array<string> = [];
+
+    //   for (let str of arr) {
+    //     if (!result.includes(str)) {
+    //       result.push(str);
+    //     }
+    //   }
+
+    //   return dispatch({
+    //     type: "ADD_TAG_BY_GROUP",
+    //     payload: {
+    //       tagsForGroup: result,
+    //     },
+    //   });
+    // }
+    // unique(arr);
   }, [state.dataList]);
   return (
     <div className="App">
@@ -159,23 +180,8 @@ function App() {
           <div className="body__list">
             {!state.group && List(state.dataList)}
           </div>
-          <div className="body_column">
-            {state.group &&
-              state.tagsForGroup.map((itemGroup: string, index: number) => (
-                <div key={index}>
-                  <div>{itemGroup}</div>
-                  <div className="body__group">
-                    {state.dataList.map(
-                      (item: IDataListItem, index: number) =>
-                        itemGroup === item.tag && (
-                          <div key={index} className="body__item">
-                            <img src={item.url} alt="" />
-                          </div>
-                        )
-                    )}
-                  </div>
-                </div>
-              ))}
+          <div className="body_groupList">
+            {state.group && GroupList(state.tagsForGroupWithData)}
           </div>
         </div>
       </div>

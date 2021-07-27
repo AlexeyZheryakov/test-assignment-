@@ -4,7 +4,7 @@ export const initialState = {
   dataList: [],
   search: "",
   group: false,
-  tagsForGroup: [],
+  tagsForGroupWithData: {},
   loading: false,
 };
 
@@ -43,7 +43,7 @@ const reduser = (state: IState, action: IAction) => {
     case "ADD_TAG_BY_GROUP":
       return {
         ...state,
-        tagsForGroup: action.payload.tagsForGroup || initialState.tagsForGroup,
+        tagsForGroupWithData: action.payload.tagsForGroupWithData || initialState.tagsForGroupWithData,
       };
     default:
       return state;
