@@ -1,41 +1,53 @@
-import { IState, Action, IAction } from './types';
+import { IState, IAction } from "./types";
 
-const reduser = (state:IState, action:any) => {
-    switch (action.type) {
-        case 'clear':
-            return {
-                ...state,
-                dataList: action.payload.dataList,
-                search: action.payload.search,
-            }
-        case 'search':
-            return {
-                ...state,
-                search: action.payload.search,
-            }
-        case 'group':
-            return {
-                ...state,
-                group: action.payload.group,
-            }
-        case 'loading false':
-            return {
-                ...state,
-                loading: action.payload.loading,
-            }
-        case 'add dataList':
-            return {
-                ...state,
-                dataList: [...state.dataList, action.payload.dataList],
-                loading: action.payload.loading,
-            }
-        case 'add tags for group':
-            return {
-                ...state,
-                tagsForGroup: action.payload.tagsForGroup,
-            }
-        default: return state
-    }
-}
+export const initialState = {
+  dataList: [],
+  search: "",
+  group: false,
+  tagsForGroup: [],
+  loading: false,
+};
+
+const reduser = (state: IState, action: IAction) => {
+  switch (action.type) {
+    case "CLEAR":
+      return {
+        ...state,
+        dataList: action.payload.dataList || initialState.dataList,
+        search: action.payload.search || initialState.search,
+      };
+    case "SEARCH":
+      return {
+        ...state,
+        search: action.payload.search || initialState.search,
+      };
+    case "GROUP":
+      return {
+        ...state,
+        group: action.payload.group || initialState.group,
+      };
+    case "LOADING":
+      return {
+        ...state,
+        loading: action.payload.loading || initialState.loading,
+      };
+    case "ADD_LIST":
+      return {
+        ...state,
+        dataList: [
+          ...state.dataList,
+          ...(action.payload.dataList || initialState.dataList),
+        ],
+        loading: action.payload.loading || initialState.loading,
+      };
+    case "ADD_TAG_BY_GROUP":
+      return {
+        ...state,
+        tagsForGroup: action.payload.tagsForGroup || initialState.tagsForGroup,
+      };
+    default:
+      return state;
+  }
+};
 
 export default reduser;
