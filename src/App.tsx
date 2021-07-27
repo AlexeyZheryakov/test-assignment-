@@ -119,10 +119,10 @@ function App() {
       <div className="body">
         <div className="conteiner">
           <div className="body__list">
-            {!state.group && List(state.dataList)}
+            {!state.group && List(state.dataList, tagHandler)}
           </div>
           <div className="body_groupList">
-            {state.group && GroupList(state.tagsForGroupWithData)}
+            {state.group && GroupList(state.tagsForGroupWithData, tagHandler)}
           </div>
         </div>
       </div>

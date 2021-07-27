@@ -2,7 +2,8 @@ import "../App.scss";
 import { IDataListItem } from "../types";
 import { ITagsForGroupWithData } from '../types';
 
-function GroupList(props:ITagsForGroupWithData) {
+function GroupList(props:ITagsForGroupWithData, tagHandler:Function) {
+  const handleClick = (tag: string) => () => tagHandler(tag);
   return (
     <div className="body_column">
       {Object.keys(props).map((tag:string, index:number) => (
@@ -10,7 +11,7 @@ function GroupList(props:ITagsForGroupWithData) {
           <div>{tag}</div>
           <div className="body__group">
             {props[tag].map((item:IDataListItem, index:number) => (
-              <div key={index} className="body__item">
+              <div onClick={handleClick(tag)} key={index} className="body__item">
                 <img src={item.url} alt="" />
               </div>
             ))}
