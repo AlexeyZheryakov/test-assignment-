@@ -22,15 +22,15 @@ const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const getImageByDeley = async (
     tags: string[],
-    callback: (res: { ok: boolean; data: IData }) => void,
+    callback: (res: { ok: boolean; data: IData; err: string }) => void,
     loading: (loading: boolean) => void
 ) => {
     for await (const tag of tags) {
         try {
             const { data } = await getImage(tag);
-            callback({ ok: true, data });
+            callback({ ok: true, data, err: '' });
         } catch(error) {
-            callback({ ok: false, data: {data: {image_url: ''}} })
+            callback({ ok: false, data: {data: {image_url: ''}}, err: `${error}` })
         }
 
         await sleep(5000);

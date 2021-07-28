@@ -7,6 +7,7 @@ import List from './Components/List';
 import GroupList from './Components/GroupList';
 import SearchForm from './Components/SearchForm';
 import { IData } from './Api';
+import { Modal } from "react-bootstrap";
 
 function App() {
   const [state, dispatch] = useReducer<React.Reducer<IState, IAction>>(
@@ -42,7 +43,7 @@ function App() {
     });
   };
 
-  const callbackData = (res: { ok: boolean, data: IData}) => {
+  const callbackData = (res: { ok: boolean, data: IData, err: string}) => {
     if(res.ok) {
       const arr = [];
       arr.push(res.data);
@@ -53,7 +54,7 @@ function App() {
         },
       })
     } else {
-      alert("Произошла http ошибка");
+      modalHandler(true, res.err)
       dispatch({
         type: "LOADING",
         payload: {
@@ -76,20 +77,26 @@ function App() {
 
   const handleLoading = () => {
     if (state.search === "") {
-      alert('Заполните поле "тег"');
+      modalHandler(true, 'Заполните поле "тег"')
     } else if (/^[A-Za-z,]+$/.test(state.search) && state.search !=='delay') {
       Api.getImages(state.search.split(',')).then((res) => {
         const arr:Array<IData> = [];
-        res.map((item) => arr.push(item.data))
-        dispatch({
+        res.map((item, index) => { 
+          if (item.data.data.image_url !== undefined) {
+            arr.push(item.data)
+            
+          } else {
+            modalHandler(true, `По тегу"${state.search.split(',')[index]}" ничего не найдено`);
+          }
+        })
+        arr.length && dispatch({
           type: "ADD_LIST",
           payload: {
             dataList: [{ tag: state.search, data: arr}],
           },
         })
-      }
-      );
-    } else if (state.search === "delay"){
+      }).catch((e) => modalHandler(true, `${e}`));
+    } else if (state.search === "delay") {
       dispatch({
         type: "LOADING",
         payload: {
@@ -98,49 +105,19 @@ function App() {
       });
       Api.getImageByDeley(randomTags, callbackData, callbackLoading)
     }else {
-      alert('Не допустимое значение поля "тег", только латинские буквы, через запятую, без пробелов');
+      modalHandler(true, 'Не допустимое значение поля "тег", только латинские буквы, через запятую, без пробелов')
     }
   };
-
-  // const getData = async (tag:string) => {
-  //   try {
-  //     dispatch({
-  //       type: "LOADING",
-  //       payload: {
-  //         loading: true,
-  //       },
-  //     });
-  //     const { data } = await Api.getData(tag);
-  //     setTimeout(() => {
-  //       if (data.data.image_url !== undefined) {
-  //         dispatch({
-  //           type: "ADD_LIST",
-  //           payload: {
-  //             dataList: [{ tag: state.search, url: data.data.image_url }],
-  //             loading: false,
-  //           },
-  //         });
-  //         console.log(state.dataList);
-  //       } else {
-  //         alert("По тегу ничего не найдено");
-  //         dispatch({
-  //           type: "LOADING",
-  //           payload: {
-  //             loading: true,
-  //           },
-  //         });
-  //       }
-  //     }, 1000);
-  //   } catch (error) {
-  //     alert("Произошла http ошибка");
-  //     dispatch({
-  //       type: "LOADING",
-  //       payload: {
-  //         loading: true,
-  //       },
-  //     });
-  //   }
-  // };
+  
+  const modalHandler = (flag: boolean, text: string) => {
+    dispatch({
+      type: "SHOW_MODAL",
+      payload: {
+        showModal: flag,
+        massegeModal: text,
+      }
+    })
+  }
 
   const groupByTag = (array:Array<IDataListItem>) => {
     const groupByTagObject =  array.reduce((acc:any, item) => {
@@ -165,6 +142,19 @@ function App() {
 
   return (
     <div className="App">
+      <Modal
+        size="sm"
+        show={state.showModal}
+        onHide={() => modalHandler(false, '')}
+        aria-labelledby="example-modal-sizes-title-sm"
+      >
+        <Modal.Header closeButton>
+          <Modal.Title id="modal">
+            Внимание!
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>{state.massegeModal}</Modal.Body>
+      </Modal>
       <div className="SearchForm">
         <SearchForm 
           state={state}

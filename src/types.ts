@@ -5,6 +5,8 @@ export interface IState {
   group: boolean;
   tagsForGroupWithData: ITagsForGroupWithData;
   loading: boolean;
+  showModal: boolean;
+  massegeModal: string;
 }
 
 export interface ITagsForGroupWithData {
@@ -22,6 +24,8 @@ interface IPayload {
   group?: boolean;
   tagsForGroupWithData?: Array<Array<IDataListItem>>;
   loading?: boolean;
+  showModal?: boolean;
+  massegeModal?: string;
 }
 
 type ActionType =
@@ -30,7 +34,8 @@ type ActionType =
   | "GROUP"
   | "LOADING"
   | "ADD_LIST"
-  | "ADD_TAG_BY_GROUP";
+  | "ADD_TAG_BY_GROUP"
+  | "SHOW_MODAL"
 
 export interface IAction {
   type: ActionType;

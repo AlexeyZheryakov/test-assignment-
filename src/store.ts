@@ -6,6 +6,8 @@ export const initialState = {
   group: false,
   tagsForGroupWithData: {},
   loading: false,
+  showModal: false,
+  massegeModal: "",
 };
 
 const reducer = (state: IState, action: IAction) => {
@@ -43,6 +45,12 @@ const reducer = (state: IState, action: IAction) => {
       return {
         ...state,
         tagsForGroupWithData: action.payload.tagsForGroupWithData || initialState.tagsForGroupWithData,
+      };
+    case "SHOW_MODAL":
+      return {
+        ...state,
+        showModal: action.payload.showModal || initialState.showModal,
+        massegeModal: action.payload.massegeModal || initialState.massegeModal,
       };
     default:
       return state;
