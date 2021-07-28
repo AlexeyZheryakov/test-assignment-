@@ -1,13 +1,14 @@
 import "../App.scss";
 import { IDataListItem } from "../types";
-import { ITagsForGroupWithData } from '../types';
-
+import { ITagsForGroupWithData } from "../types";
+import { IData } from "../Api";
 interface IGroupList {
+  dataList: Array<IDataListItem>,
   tagsForGroupWithData: ITagsForGroupWithData,
   tagHandler: (value:string )=> void,
 }
 
-const GroupList:React.FC<IGroupList> = ({tagsForGroupWithData, tagHandler}) => {
+const GroupList:React.FC<IGroupList> = ({ dataList, tagsForGroupWithData, tagHandler }) => {
   const handleClick = (tag: string) => () => tagHandler(tag);
   return (
     <div className="body_column">
@@ -15,9 +16,11 @@ const GroupList:React.FC<IGroupList> = ({tagsForGroupWithData, tagHandler}) => {
         <div key={index}>
           <div>{tag}</div>
           <div className="body__group">
-            {tagsForGroupWithData[tag].map((item:IDataListItem, index:number) => (
-              <div onClick={handleClick(tag)} key={index} className="body__item">
-                <img src={item.url} alt="" />
+            {dataList.map((item: IDataListItem, index: number) => (
+              tag === item.tag && <div onClick={handleClick(item.tag)} key={index} className="body__item">
+                {item.data.map((itemData: IData, index: number) => (
+                  <img key={index} src={itemData.data.image_url} alt="" />
+                ))}
               </div>
             ))}
           </div>

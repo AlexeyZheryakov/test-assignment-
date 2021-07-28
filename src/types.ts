@@ -1,3 +1,4 @@
+import { IData } from './Api';
 export interface IState {
   dataList: Array<IDataListItem>;
   search: string;
@@ -12,7 +13,7 @@ export interface ITagsForGroupWithData {
   
 export interface IDataListItem {
   tag: string;
-  url: string;
+  data: Array<IData>;
 }
 
 interface IPayload {

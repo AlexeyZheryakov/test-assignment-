@@ -1,6 +1,7 @@
 import React from "react";
 import "../App.scss";
 import { IDataListItem } from "../types";
+import { IData } from "../Api"
 
 interface IList {
   dataList: Array<IDataListItem>,
@@ -13,7 +14,9 @@ const List: React.FC<IList> = ({dataList, tagHandler}) => {
     <div className="body__row">
       {dataList.map((item: IDataListItem, index: number) => (
         <div onClick={handleClick(item.tag)} key={index} className="body__item">
-          <img src={item.url} alt="" />
+          {item.data.map((itemData: IData, index: number) => (
+            <img key={index} src={itemData.data.image_url} alt="" />
+          ))}
         </div>
       ))}
     </div>

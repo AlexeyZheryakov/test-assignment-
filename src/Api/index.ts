@@ -36,7 +36,7 @@ const getImageByDeley = async (
         await sleep(5000);
         
     };
-    loading(false);
+    loading(false)
 };
 
 const Api = {

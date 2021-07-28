@@ -44,10 +44,12 @@ function App() {
 
   const callbackData = (res: { ok: boolean, data: IData}) => {
     if(res.ok) {
+      const arr = [];
+      arr.push(res.data);
       dispatch({
         type: "ADD_LIST",
         payload: {
-          dataList: [{ tag: state.search, url: res.data.data.image_url }],
+          dataList: [{ tag: state.search, data: arr}],
         },
       })
     } else {
@@ -76,7 +78,16 @@ function App() {
     if (state.search === "") {
       alert('Заполните поле "тег"');
     } else if (/^[A-Za-z,]+$/.test(state.search) && state.search !=='delay') {
-      Api.getImages(state.search.split(',')).then((res) => console.log(res)
+      Api.getImages(state.search.split(',')).then((res) => {
+        const arr:Array<IData> = [];
+        res.map((item) => arr.push(item.data))
+        dispatch({
+          type: "ADD_LIST",
+          payload: {
+            dataList: [{ tag: state.search, data: arr}],
+          },
+        })
+      }
       );
     } else if (state.search === "delay"){
       dispatch({
@@ -169,7 +180,7 @@ function App() {
             {!state.group && <List dataList={state.dataList} tagHandler={tagHandler}/> }
           </div>
           <div className="body_groupList">
-            {state.group && <GroupList tagsForGroupWithData={state.tagsForGroupWithData} tagHandler={tagHandler}/>}
+            {state.group && <GroupList dataList={state.dataList} tagsForGroupWithData={state.tagsForGroupWithData} tagHandler={tagHandler}/>}
           </div>
         </div>
       </div>
