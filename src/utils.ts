@@ -9,5 +9,5 @@ export const groupByTag = (array:Array<IDataListItem>) => {
       }
       return acc;
   }, {});
-  return Object.values(groupByTagObject)
+  return groupByTagObject
 }

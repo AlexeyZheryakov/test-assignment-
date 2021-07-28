@@ -22,7 +22,7 @@ interface IPayload {
   dataList?: Array<IDataListItem>;
   search?: string;
   group?: boolean;
-  tagsForGroupWithData?: Array<Array<IDataListItem>>;
+  tagsForGroupWithData?: ITagsForGroupWithData;
   loading?: boolean;
   showModal?: boolean;
   massegeModal?: string;

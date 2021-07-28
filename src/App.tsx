@@ -2,13 +2,15 @@ import React, { useReducer } from 'react';
 import './App.scss';
 import Api from './Api';
 import reducer, { initialState } from "./store";
-import { IDataListItem, IState, IAction } from "./types";
+import { IState, IAction } from "./types";
 import List from './Components/List';
 import GroupList from './Components/GroupList';
 import SearchForm from './Components/SearchForm';
 import { IData } from './Api';
 import { Modal } from 'react-bootstrap';
 import { groupByTag } from './utils';
+
+const randomTags = ['dog', 'cat', 'mouse', 'tank', 'axaxa', 'salute'];
 
 function App() {
   const [state, dispatch] = useReducer<React.Reducer<IState, IAction>>(
@@ -73,8 +75,6 @@ function App() {
       },
     });
   }
-
-  const randomTags = ['dog', 'cat', 'mouse', 'boom', 'axaxa']
 
   const handleLoading = () => {
     if (state.search === "") {
