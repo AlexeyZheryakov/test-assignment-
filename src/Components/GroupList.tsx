@@ -19,10 +19,10 @@ const GroupList:React.FC<IGroupList> = ({tagsForGroupWithData, tagHandler}) => {
               <div onClick={handleClick(tag)} key={index} className="body__item">
                 <img src={item.url} alt="" />
               </div>
-            ))};
+            ))}
           </div>
         </div>
-      ))};
+      ))}
     </div>
   );
 }

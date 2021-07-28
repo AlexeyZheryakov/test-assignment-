@@ -6,6 +6,7 @@ import { IDataListItem, IState, IAction } from "./types";
 import List from './Components/List';
 import GroupList from './Components/GroupList';
 import SearchForm from './Components/SearchForm';
+import { IData } from './Api';
 
 function App() {
   const [state, dispatch] = useReducer<React.Reducer<IState, IAction>>(
@@ -41,48 +42,15 @@ function App() {
     });
   };
 
-  const handleLoading = () => {
-    if (state.search === "") {
-      alert('Заполните поле "тег"');
-    } else if (/^[A-Za-z,]+$/.test(state.search)) {
-      allQuery();
-    } else {
-      alert('Не допустимое значение поля "тег", только латинские буквы');
-    }
-  };
-
-  const allQuery = () => Promise.all(state.search.split(',').map((tag) => getData(tag))).then(e => console.log(e));
-
-  const getData = async (tag:string) => {
-    try {
+  const callbackData = (res: { ok: boolean, data: IData}) => {
+    if(res.ok) {
       dispatch({
-        type: "LOADING",
+        type: "ADD_LIST",
         payload: {
-          loading: true,
+          dataList: [{ tag: state.search, url: res.data.data.image_url }],
         },
-      });
-      const { data } = await Api.getData(tag);
-      setTimeout(() => {
-        if (data.data.image_url !== undefined) {
-          dispatch({
-            type: "ADD_LIST",
-            payload: {
-              dataList: [{ tag: state.search, url: data.data.image_url }],
-              loading: false,
-            },
-          });
-          console.log(state.dataList);
-        } else {
-          alert("По тегу ничего не найдено");
-          dispatch({
-            type: "LOADING",
-            payload: {
-              loading: true,
-            },
-          });
-        }
-      }, 1000);
-    } catch (error) {
+      })
+    } else {
       alert("Произошла http ошибка");
       dispatch({
         type: "LOADING",
@@ -91,7 +59,77 @@ function App() {
         },
       });
     }
+  }
+
+  const callbackLoading = (loading:boolean) => {
+    dispatch({
+      type: "LOADING",
+      payload: {
+        loading: loading,
+      },
+    });
+  }
+
+  const randomTags = ['dog', 'cat', 'mouse', 'boom', 'axaxa']
+
+  const handleLoading = () => {
+    if (state.search === "") {
+      alert('Заполните поле "тег"');
+    } else if (/^[A-Za-z,]+$/.test(state.search) && state.search !=='delay') {
+      Api.getImages(state.search.split(',')).then((res) => console.log(res)
+      );
+    } else if (state.search === "delay"){
+      dispatch({
+        type: "LOADING",
+        payload: {
+          loading: true,
+        },
+      });
+      Api.getImageByDeley(randomTags, callbackData, callbackLoading)
+    }else {
+      alert('Не допустимое значение поля "тег", только латинские буквы, через запятую, без пробелов');
+    }
   };
+
+  // const getData = async (tag:string) => {
+  //   try {
+  //     dispatch({
+  //       type: "LOADING",
+  //       payload: {
+  //         loading: true,
+  //       },
+  //     });
+  //     const { data } = await Api.getData(tag);
+  //     setTimeout(() => {
+  //       if (data.data.image_url !== undefined) {
+  //         dispatch({
+  //           type: "ADD_LIST",
+  //           payload: {
+  //             dataList: [{ tag: state.search, url: data.data.image_url }],
+  //             loading: false,
+  //           },
+  //         });
+  //         console.log(state.dataList);
+  //       } else {
+  //         alert("По тегу ничего не найдено");
+  //         dispatch({
+  //           type: "LOADING",
+  //           payload: {
+  //             loading: true,
+  //           },
+  //         });
+  //       }
+  //     }, 1000);
+  //   } catch (error) {
+  //     alert("Произошла http ошибка");
+  //     dispatch({
+  //       type: "LOADING",
+  //       payload: {
+  //         loading: true,
+  //       },
+  //     });
+  //   }
+  // };
 
   const groupByTag = (array:Array<IDataListItem>) => {
     const groupByTagObject =  array.reduce((acc:any, item) => {

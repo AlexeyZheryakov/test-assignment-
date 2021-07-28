@@ -15,7 +15,7 @@ const List: React.FC<IList> = ({dataList, tagHandler}) => {
         <div onClick={handleClick(item.tag)} key={index} className="body__item">
           <img src={item.url} alt="" />
         </div>
-      ))};
+      ))}
     </div>
   );
 }

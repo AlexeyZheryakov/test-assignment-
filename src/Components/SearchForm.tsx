@@ -29,14 +29,14 @@ const SearchForm: React.FC<ISearchForm> = ({state, tagHandler, handleLoading, ha
                 </div>
                 <div className="title__item">
                     {!state.loading && (
-                    <Button onClick={loading} variant="success">
-                        Загрузить
-                    </Button>
+                        <Button onClick={loading} variant="success">
+                            Загрузить
+                        </Button>
                     )}
                     {state.loading && (
-                    <Button disabled variant="success">
-                        Загрузка...
-                    </Button>
+                        <Button disabled variant="success">
+                            Загрузка...
+                        </Button>
                     )}
                 </div>
                 <div className="title__item">

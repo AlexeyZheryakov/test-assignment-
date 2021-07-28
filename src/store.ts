@@ -38,7 +38,6 @@ const reducer = (state: IState, action: IAction) => {
           ...state.dataList,
           ...(action.payload.dataList || initialState.dataList),
         ],
-        loading: action.payload.loading || initialState.loading,
       };
     case "ADD_TAG_BY_GROUP":
       return {
