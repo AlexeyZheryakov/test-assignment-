@@ -10,7 +10,7 @@ interface IImageURL {
 
 const getImage = (tag: string) =>
     axios.get<IData>(
-        `https://api.giphy.com/v1/gifs/random?api_key=gTJAO48YcpmrADUyo4opy4ES4g7iDBxx&tag=${tag}`
+        `${process.env.REACT_APP_API_URL}/v1/gifs/random?api_key=${process.env.REACT_APP_API_KEY}&tag=${tag}`
     );
 
 const getImages = (tags: string[]) => {
@@ -25,6 +25,7 @@ const getImageByDeley = async (
     callback: (res: { ok: boolean; data: IData; err: string }) => void,
     loading: (loading: boolean) => void
 ) => {
+    loading(true);
     for await (const tag of tags) {
         try {
             const { data } = await getImage(tag);
@@ -36,7 +37,7 @@ const getImageByDeley = async (
         await sleep(5000);
         
     };
-    loading(false)
+    loading(false);
 };
 
 const Api = {

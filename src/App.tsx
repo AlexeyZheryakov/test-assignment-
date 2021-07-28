@@ -1,13 +1,14 @@
-import React, { useReducer } from "react";
-import "./App.scss";
-import Api from "./Api";
+import React, { useReducer } from 'react';
+import './App.scss';
+import Api from './Api';
 import reducer, { initialState } from "./store";
 import { IDataListItem, IState, IAction } from "./types";
 import List from './Components/List';
 import GroupList from './Components/GroupList';
 import SearchForm from './Components/SearchForm';
 import { IData } from './Api';
-import { Modal } from "react-bootstrap";
+import { Modal } from 'react-bootstrap';
+import { groupByTag } from './utils';
 
 function App() {
   const [state, dispatch] = useReducer<React.Reducer<IState, IAction>>(
@@ -80,8 +81,9 @@ function App() {
       modalHandler(true, 'Заполните поле "тег"')
     } else if (/^[A-Za-z,]+$/.test(state.search) && state.search !=='delay') {
       Api.getImages(state.search.split(',')).then((res) => {
+        callbackLoading(true);
         const arr:Array<IData> = [];
-        res.map((item, index) => { 
+        res.forEach((item, index) => { 
           if (item.data.data.image_url !== undefined) {
             arr.push(item.data)
             
@@ -95,14 +97,8 @@ function App() {
             dataList: [{ tag: state.search, data: arr}],
           },
         })
-      }).catch((e) => modalHandler(true, `${e}`));
+      }).catch((e) => modalHandler(true, `${e}`)).finally(() => callbackLoading(false));
     } else if (state.search === "delay") {
-      dispatch({
-        type: "LOADING",
-        payload: {
-          loading: true,
-        },
-      });
       Api.getImageByDeley(randomTags, callbackData, callbackLoading)
     }else {
       modalHandler(true, 'Не допустимое значение поля "тег", только латинские буквы, через запятую, без пробелов')
@@ -119,25 +115,13 @@ function App() {
     })
   }
 
-  const groupByTag = (array:Array<IDataListItem>) => {
-    const groupByTagObject =  array.reduce((acc:any, item) => {
-      if (acc[item.tag]) {
-        acc[item.tag] = [...acc[item.tag], item];
-      } else {
-        acc[item.tag] = [item];
-      }
-      return acc;
-  }, {});
-  return dispatch({
-    type: "ADD_TAG_BY_GROUP",
-    payload: {
-      tagsForGroupWithData: groupByTagObject,
-    },
-  });
-  }
-
   React.useEffect(() => {
-   groupByTag(state.dataList);
+    dispatch({
+      type: "ADD_TAG_BY_GROUP",
+      payload: {
+        tagsForGroupWithData: groupByTag(state.dataList)
+      },
+    });
   }, [state.dataList]);
 
   return (
